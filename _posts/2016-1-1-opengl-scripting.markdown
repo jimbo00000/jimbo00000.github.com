@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "OpenGL Scripting"
+title:  "OpenGL Scripting: Python"
 date:   2016-1-1 10:37:22 -0500
 categories: opengl portable programming scripting
 ---
@@ -28,15 +28,15 @@ Once this works, you can plug in callback functions for input events: mouse, key
 #### Ready to draw
 minimal.py uses only the simplest GL draw call, `glClear`. If you want to do anything more interesting, you'll need to:
 
- - compile and use a shader program with `glUseProgram`
+ - compile and use a shader program with `glCompileShader` and `glUseProgram`
  - upload native byte array data(floats, shorts, ints, etc.) with `glBufferData`
 
-Yes, yes, you can use immediate mode and the fixed function pipeline. **Please don't!** The right way is to initialize all such arrays once at runtime before any drawing is done, but after a GL context is created. I've created an [entry point for this purpose][scene07_initGL] called `initGL`. You'll appreciate how much faster everything runs.
+Don't fall into the temptation of doing everything in immediate mode with the fixed function pipeline. The right way is to initialize all such arrays once at runtime before any drawing is done, but after a GL context is created. I've created an [entry point for this purpose][scene07_initGL] called `initGL` and a corresponding `exitGL` to deallocate. You'll appreciate how much faster everything runs.
 
 Native arrays are probably the most challenging part of connecting up OpenGL to higher level languages. Most experts seem to recommend numpy for the task, not only for the clarity of its API but its performance as well. I find the numpy dependency to be rather heavyweight to pull in in its entirety just for `numpy.array`, so I've been using python's built-in `ctypes` arrays instead. I have not noticed any differences in these toy examples.
 
-#### Drawing, drawing, drawing
-The main loop calls draw repeatedly, followed by `glfwSwapBuffers`. If vsync is on, the swap call will block and limit the frame rate to the refresh rate of your primary monitor[^2]. If it's off, watch out - the app will tend to become unresponsive to input on Unix-like OSs, spinning so rapidly through its tight main loop that input events can't break in.
+#### Drawing, drawing, and drawing some more 
+The main loop calls draw repeatedly, followed by `glfwSwapBuffers`. If vsync is on, the swap call will block and limit the frame rate to the refresh rate of your primary monitor[^2]. If it's off, watch out - the app will tend to become unresponsive to input on Unix-like OSs, spinning so rapidly through its tight main loop that input events can't break in. You might as well leave vsync on for this reason, but seeing that 1300 FPS value does give a rough estimate of your app's base drawing time.
 
 
 [hardcode_shaders_py]: https://github.com/jimbo00000/RiftSkeleton/blob/master/tools/hardcode_shaders.py
@@ -53,6 +53,6 @@ The main loop calls draw repeatedly, followed by `glfwSwapBuffers`. If vsync is 
 ##### Footnotes:
 
 [^1]: I've tried installing numpy with pip, but it never quite worked on Windows. You apparently need a separately packaged installer executable for that, which complicates its installation for PyPy.
-[^2]: OS- and driver-dependent functionality
+[^2]: VSync is OS- and driver-dependent functionality. Remember to check your settings in your respective GPU manufacturer's control panel as they can override the effect of `glfwSwapInterval`.
 
 [scene07_initGL]: https://bitbucket.org/jimbo00000/opengl-with-python/src/978902d99ec4a7537e52060c9b0b1e39064b30e3/scene/scene07.py?at=master&fileviewer=file-view-default#scene07.py-64
