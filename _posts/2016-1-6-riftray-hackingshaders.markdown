@@ -27,11 +27,16 @@ The first thing we have to do is add correct accreditation for the author:
 // @var title Retro Futuristic Thing
 // @var author Flyguy
 // @var url https://www.shadertoy.com/view/4dt3RX
+// @var license CC BY-NC-SA 3.0
 ~~~
 
-These lines are comments, so they don't affect the shadertoy's execution, but while RiftRay is loading the shader it [looks for the string][@varline] and parses out variable decls and values for use in the tweakbar. These lines will make sure that Flyguy gets his due props for creating something awesome and giving it to all of us on a permissive license.
+These lines are comments, so they don't affect the shadertoy's execution, but while RiftRay is loading the shader it [looks for the string][@varline] and parses out variable decls and values for use in the tweakbar. These lines will make sure that Flyguy gets his due props for creating something awesome and giving it to all of us on a permissive license. 
+
+*NOTE*: The default license is [CC BY-NC-SA 3.0][ccby] - be sure to check for and honor any licensing info in comments in the code.
 
 [@varline]: https://github.com/jimbo00000/RiftRay/blob/master/src/Util/GL/ShaderToy.cpp#L214
+[ccby]: http://creativecommons.org/licenses/by-nc-sa/3.0/deed.en_US]
+
 
 ## Texture channels
 
@@ -85,7 +90,7 @@ We want lines 298-310. Select them, cut, and paste them into the `getSceneColor`
 
 ## Testing it out
 
-How it's ready to drop into RiftRay. Select all the source, copy, paste into a new buffer in your text editor and Save As `retro_futuristic_thing.glsl` in RiftRay's `shaders/` directory. Launch RiftRay and it should load up. Leave your headset off for now - there's a non-zero chance this thing could still cause nausea.
+Now it's ready to drop into RiftRay. Select all the source, copy, paste into a new buffer in your text editor and Save As `retro_futuristic_thing.glsl` in RiftRay's `shaders/` directory. Launch RiftRay and it should load up. Leave your headset off for now - there's a non-zero chance this thing could still cause nausea.
 
 ![retro-firsttry](/assets/retro-firsttry.PNG)
 
@@ -162,8 +167,9 @@ We can guess and play with these bounds and increments until the range seems rig
 
 Most of this could and should be automated. Shaders that have implemented the VR entry point as per the Shadertoy spec could get everything needed from [Shadertoy's JSON API][api]. I've implemented a good amount of this in the [kinderegg][kinderegg] project, if anyone wants to port it over and send me a pull request.
 
-RiftRay can offer a couple of features the Shadertoy site itself does not yet: dynamic render target resolution scaling and cinemascope for increased frame rates, undistorted mirroring and the tweakbar controls. But it also lags behind Shadertoy's functionality in a few key ways: Texture sampling options per-channel, webcam, video, audio, and cubemap texture inputs, GPU sound, and now Multipass Rendering. And that last one is huge.
+RiftRay can offer a couple of features the Shadertoy site itself does not yet: dynamic render target resolution scaling and cinemascope for increased frame rates, undistorted mirroring and the tweakbar controls. But it also lags behind Shadertoy's functionality in a few key ways[^1]: Texture sampling options per-channel, webcam, video, audio, and cubemap texture inputs, GPU sound, and now Multipass Rendering. And that last one is huge.
 
 [api]: https://www.shadertoy.com/api
 [kinderegg]: https://github.com/jimbo00000/kinderegg
 
+[^1]: Oh, and a vibrant social network, thousands of shaders, users, comments, hearts, API, search...
