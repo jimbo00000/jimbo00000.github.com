@@ -35,7 +35,7 @@ Although no VRScript releases or announcements have been made, you can enjoy the
 
 
 and does it all with untextured cubes. Here's a somewhat lackluster screenshot:
-![game shot](/assets/gamecap2.png)
+![game shot](/assets/gamecap2.PNG)
 
 [RiftSkel]: https://bitbucket.org/jimbo00000/riftskel/
 [luajit]: http://luajit.org/
