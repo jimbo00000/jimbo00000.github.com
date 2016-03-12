@@ -76,7 +76,7 @@ As of now, RiftSkel is lacking features that VRScript has been demonstrated to h
 |               | VRScript      | RiftSkel  |
 | ------------- |:-------------:| -----:|
 | Language      | Racket        | LuaJIT |
-| Rapid Prototyping | yes | yes |
+| Live Reload | yes | yes |
 | FFI      | yes      |   yes |
 | OpenGL   | yes, with<br>geometry wrapper      |   yes |
 | Sound loading/playing | yes | yes |
@@ -140,7 +140,7 @@ This will have to be revisited(hey @brianpeiris).
 [hmdprogramming]: https://www.reddit.com/r/hmdprogramming
 
 #### Android Build
-RiftSkel works right now only on desktop OSs: Windows, Linux, MacOS, PCBSD, Solaris. OVR SDK is supported where available(0.8 on Windows, 0.5 on Linux, MacOS). BASS is optional, used where available. An Android port should be entirely possible, as LuaJIT is known to work on Android(and many other platforms). There are, in fact, some [very well-known developement houses that use LuaJIT][otoy_post].
+RiftSkel works right now only on desktop OSs: Windows, Linux, MacOS, PCBSD, Solaris. OVR SDK is supported where available(0.8 on Windows, 0.5 on Linux, MacOS). BASS is optional, used where available. An Android port should be entirely possible, as LuaJIT is known to work on Android(and many other platforms). There are, in fact, some [very well-known development houses that use LuaJIT][otoy_post].
 
 [otoy_post]: https://www.reddit.com/r/oculus/comments/3t34qc/thoughts_on_vrscript_from_tony_parisi/cx2v2h3
 
