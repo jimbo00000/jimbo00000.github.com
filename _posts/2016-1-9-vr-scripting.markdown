@@ -81,23 +81,28 @@ As of now, RiftSkel is lacking features that VRScript has been demonstrated to h
 | OpenGL   | yes, with<br>geometry wrapper      |   yes |
 | Sound loading/playing | yes | yes |
 | Platform | Android | Desktop |
-| Publishing | yes | |
+| Image loading | yes | from raw |
+| In-world text | SDF | regular bitmaps |
+| Environment maps | stereo | mono |
 | Model loading | yes | |
-| Image loading | yes | |
-| In-world text display | yes | |
-| SDF Fonts | yes | |
-| Panoramic stereo display | yes | |
+| Publishing | yes | |
 | | | |
   
+### FFI
+
 The [FFI(foreign function interface)][ffi] is about the most powerful aspect of using a scripting language - it can link with native libraries in .DLL, .so, or .dylib formats, allowing you to do anything a native app can do.[^1] RiftSkel uses the FFI to call into [OpenGL][opengl] for full graphics capability and [Un4seen's BASS][bass] library for audio.[^2]
 
 [ffi]: http://luajit.org/ext_ffi.html
 [opengl]: https://www.khronos.org/
 [bass]: http://www.un4seen.com/
 
-Racket has the DrRacket IDE. The excellent and open source [ZeroBrane Studio][zbstudio] can be used to debug LuaJIT in standalone form; not yet sure about embedded code. For debugging, I have a [standalone project available][ogl-luajit] to take the same scene interface in pure LuaJIT.
+### Debugging
 
+While Racket has the [DrRacket IDE][DrRacket], the excellent and open source [ZeroBrane Studio][zbstudio] can be used to debug LuaJIT. A running executable can connect to a live debugger with [mobdebug][mobdebug].
+
+[DrRacket]: https://docs.racket-lang.org/drracket/
 [zbstudio]: http://studio.zerobrane.com/
+[mobdebug]: https://studio.zerobrane.com/doc-remote-debugging
 [ogl-luajit]: https://bitbucket.org/jimbo00000/opengl-with-luajit
 
 ### Future Feature Plan
@@ -109,8 +114,10 @@ An obj model loader should be easy enough to implement using [Lua Binary I/O][lu
 [lua_binaryio]: http://www.lua.org/pil/21.2.2.html
 [FBX]: https://en.wikipedia.org/wiki/FBX
 
-#### Texture loading
-There are image loading libraries for Lua, and there is also the FFI. As with model data, I don't foresee any difficulties here. Use `glTexImage2D` and friends.
+#### Texture loading from PNG, JPG
+There are image loading libraries for Lua, and there is also the FFI. [stb_image][stb_image] is a perfect contender for porting, and since it's a header, Luajit might even just ingest the whole thing.
+
+[stb_image]: https://github.com/nothings/stb/blob/master/stb_image.h
 
 #### Panoramic Stereo
 There is [some free C++ code][OmniPano] to do this that could be ported to LuaJIT. The gist of it isn't too tough: [construct some cylindrical geometry][cylindergeom] and draw it [textured differently for each eye][texture_it]. I'm personally not wild about omnistereo imagery as it'll never work when you tilt or move your head, but it is a simple way to fill an environment with pixel data. The OVR implementation probably does something very smart with multi-resolution or partially-resident textures. The mobile SDK may have that source available.
@@ -121,9 +128,13 @@ There is [some free C++ code][OmniPano] to do this that could be ported to LuaJI
 
 [OmniPano]: https://github.com/jimbo00000/OmniPano
 
-#### In-world Text Display
+#### In-world Text Editor
+There appear to be some handy FreeType SDF tools in the `Tools/` directory of the 1.0.0 mobile SDK. A solid, fast implementation of this might be useful for the popular yet [disadvised][terrible_idea] [HMD Programming][hmdprogramming] technique, but would not be sufficient for it. To make HMD programming really work, you'll need a fully-featured [text editor][text-editors], and better yet some adjunct [graphical syntax representation][graphic-logic]. Such a thing might have to be built from scratch using OpenGL(or Vulkan) to accommodate the demands of VR display.
 
-I haven't yet found the kind of lightweight, turn-key solution I'd like for this. There appear to be some handy FreeType SDF tools in the `Tools/` directory of the 1.0.0 mobile SDK. A solid, fast implementation of this would be necessary for the popular yet [disadvised][terrible_idea] [HMD Programming][hmdprogramming] technique, but would not be sufficient for it. This will have to be revisited(hey @brianpeiris).
+[text-editors]: http://ecc-comp.blogspot.com/2015/05/a-brief-glance-at-how-5-text-editors.html
+[graphic-logic]: https://www.reddit.com/r/graphiclogic
+
+This will have to be revisited(hey @brianpeiris).
 
 [terrible_idea]: https://www.youtube.com/watch?v=rMItsZq_n20&feature=youtu.be&t=20m6s
 [hmdprogramming]: https://www.reddit.com/r/hmdprogramming
@@ -133,6 +144,7 @@ RiftSkel works right now only on desktop OSs: Windows, Linux, MacOS, PCBSD, Sola
 
 [otoy_post]: https://www.reddit.com/r/oculus/comments/3t34qc/thoughts_on_vrscript_from_tony_parisi/cx2v2h3
 
+If you've gotten luajit building and deploying on Android - please get in touch. I've been looking for an example of deploying a pre-built library to an Android device using Android Studio or its associated tools(gradle, adb, the ndk, etc.).
 
 Comparing the scene interface to the one found in the mobile SDK, everything looks similar enough that plugging in to the mobile SDK should be straightforward:
 `ovr_sdk_mobile_1.0.0.0.zip/VrSamples/Native/VrCubeWorld_Framework/Src/VrCubeWorld_Framework.cpp`
