@@ -6,7 +6,9 @@ categories: opengl portable programming vr scripting
 #published: false
 ---
 
-The [news][live] of [VRScript][vrscript] brought the promise of fast, cross-platform experience prototyping and sharing using a higher-level language to interface with a VR application's framework. This is exciting for anyone who starts new VR projects from scratch often, as it lets developers crank out small experiments with as little effort as possible.
+*post last edited on March 10 2016*
+
+The [news][live] of [VRScript][vrscript] brought the promise of fast, cross-platform experience prototyping and sharing using a higher-level language to interface with a VR application's framework. This is exciting for anyone who starts new VR projects from scratch often, as it lets developers crank out small experiments with as little effort as possible. Unfortunately, it has been months as there has been no news of an intended VRScript release. Will we ever get to play too?
 
 [live]: https://www.reddit.com/live/vn5n3360s4nz
 [vrscript]: https://www.reddit.com/r/vrscript/
@@ -41,7 +43,7 @@ and does it all with untextured cubes. Here's a somewhat lackluster screenshot:
 [luajit]: http://luajit.org/
 [gamescene]: https://bitbucket.org/jimbo00000/riftskel/src/dfdad31a5df7e1fe434745be9d21866af2bb37b7/lua/scene/gamescene.lua?at=master&fileviewer=file-view-default
 
-You can use just about any OS you want. You can play in the now old-fashioned window-on-a-screen format, or strap on an HMD and shoot from your eye like [Cyclops][Cyclops]. All of the code is [MIT licensed][mitlic], so feel free to use it, modify it, build something with it and charge for it - whatever you want. There's really not much to it. Aside from [LuaJIT's awesome performance][luajit_perf], this is the platform's core strength.
+You can use just about any OS you want. You can play in the now old-fashioned window-on-a-screen format, or strap on an HMD and shoot from your eye like [Cyclops][Cyclops]. All of the code is [MIT licensed][mitlic], so feel free to use it, modify it, build something with it and charge for it - whatever you want. There's really not much to it, only about 5000 lines of C++ code(not including luajit's ~75k lines). The two core strengths of the platform are its simplicity and  [LuaJIT's awesome performance][luajit_perf].
 
 [Cyclops]: https://www.google.com/search?q=cyclops+x+men&safe=off&espv=2&biw=1122&bih=706&source=lnms&tbm=isch&sa=X&ved=0ahUKEwic_Krw3J3KAhUGyT4KHa4AAw0Q_AUIBigB#imgrc=qXsW1Gi8GVjPSM%3A
 [luajit_perf]: http://luajit.org/performance.html
@@ -54,9 +56,12 @@ function on_lua_exitgl()
 function on_lua_draw(pModelviewMatrix, pProjectionMatrix)
 function on_lua_timestep(absTime, dt)
 function on_lua_keypressed(key)
+
+function setDataDirectory(dir)
+function settracking(absTime, controllerstate)
 ~~~
 
-[scenebridge]: https://bitbucket.org/jimbo00000/riftskel/src/11fa3fab7258ff4a3b8d7fc7608abfbc11fe515d/lua/scenebridge.lua?at=master&fileviewer=file-view-default
+[scenebridge]: https://bitbucket.org/jimbo00000/riftskel/src/62934465cd05fb02d280a07f399acac94dc2e3be/lua/scenebridge.lua?at=master&fileviewer=file-view-default
 
 
 [mitlic]: https://bitbucket.org/jimbo00000/riftskel/src/11fa3fab7258ff4a3b8d7fc7608abfbc11fe515d/LICENSE?at=master&fileviewer=file-view-default
@@ -71,9 +76,18 @@ If any part of the code throws an error, the error message will be output to the
 
 As of now, RiftSkel is lacking features that VRScript has been demonstrated to have. These should be straightforward to implement and may even benefit from being written in a higher-level language.
 
+<style>
+table{
+    border-collapse: collapse;
+    border-spacing: 0;
+}
 
+td{
+    border:1px solid #dddddd;
+}
+</style>
 
-|               | VRScript      | RiftSkel  |
+| Feature       | VRScript      | RiftSkel  |
 | ------------- |:-------------:| -----:|
 | Language      | Racket        | LuaJIT |
 | Live Reload | yes | yes |
@@ -86,7 +100,10 @@ As of now, RiftSkel is lacking features that VRScript has been demonstrated to h
 | Environment maps | stereo | mono |
 | Model loading | yes | |
 | Publishing | yes | |
-| | | |
+| In-world Console | maybe? | |
+| In-world Editor | | |
+
+<br>
   
 ### FFI
 
@@ -98,7 +115,7 @@ The [FFI(foreign function interface)][ffi] is about the most powerful aspect of 
 
 ### Debugging
 
-While Racket has the [DrRacket IDE][DrRacket], the excellent and open source [ZeroBrane Studio][zbstudio] can be used to debug LuaJIT. A running executable can connect to a live debugger with [mobdebug][mobdebug].
+While Racket has the [DrRacket IDE][DrRacket], the excellent and open source [ZeroBrane Studio][zbstudio] can be used to debug LuaJIT. A running executable can connect to a live debugger with [mobdebug][mobdebug]. There is one caveat: you can only explore variables that are used in the function in which the `require('mobdebug').start()` call was invoked. To work around this for debugging a draw function, I added a global flag that gets set on a keypress. This flag is checked every draw, and if non-nil, the debugger is invoked from there.
 
 [DrRacket]: https://docs.racket-lang.org/drracket/
 [zbstudio]: http://studio.zerobrane.com/
@@ -119,17 +136,18 @@ There are image loading libraries for Lua, and there is also the FFI. [stb_image
 
 [stb_image]: https://github.com/nothings/stb/blob/master/stb_image.h
 
-#### Panoramic Stereo
-There is [some free C++ code][OmniPano] to do this that could be ported to LuaJIT. The gist of it isn't too tough: [construct some cylindrical geometry][cylindergeom] and draw it [textured differently for each eye][texture_it]. I'm personally not wild about omnistereo imagery as it'll never work when you tilt or move your head, but it is a simple way to fill an environment with pixel data. The OVR implementation probably does something very smart with multi-resolution or partially-resident textures. The mobile SDK may have that source available.
+#### Cubemaps and Panoramic Stereo
+Cubemaps are a cheap, simple way to fill an environment with pixel data. You can find some great free cubemaps online thanks to [Humus][humus_cubemaps]. They are all monoscopic.
+
+There is [some free C++ code][OmniPano] to do stereo panoramas that could be ported to LuaJIT. The gist of it isn't too tough: [construct some cylindrical geometry][cylindergeom] and draw it [textured differently for each eye][texture_it]. I'm personally not wild about omnistereo imagery as it'll never work when you tilt or move your head. The OVR implementation probably does something very smart with multi-resolution or partially-resident textures. The mobile SDK may have that source available.
 
 [cylindergeom]: https://github.com/jimbo00000/OmniPano/blob/master/src/Panorama/PanoramaCylinder.cpp#L289
 [texture_it]: https://github.com/jimbo00000/OmniPano/blob/master/src/Panorama/PanoramaCylinder.cpp#L363
-
-
+[humus_cubemaps]: http://www.humus.name/index.php?page=Textures
 [OmniPano]: https://github.com/jimbo00000/OmniPano
 
-#### In-world Text Editor
-There appear to be some handy FreeType SDF tools in the `Tools/` directory of the 1.0.0 mobile SDK. A solid, fast implementation of this might be useful for the popular yet [disadvised][terrible_idea] [HMD Programming][hmdprogramming] technique, but would not be sufficient for it. To make HMD programming really work, you'll need a fully-featured [text editor][text-editors], and better yet some adjunct [graphical syntax representation][graphic-logic]. Such a thing might have to be built from scratch using OpenGL(or Vulkan) to accommodate the demands of VR display.
+#### In-world Text: Console, Editor
+There appear to be some handy FreeType SDF tools in the `Tools/` directory of the 1.0.0 mobile SDK. A solid, fast implementation of this might be useful for the popular yet [disadvised][terrible_idea] [HMD Programming][hmdprogramming] technique, but would not be sufficient for it. A working error console should be easy enough, but to make HMD programming really work you'll need a fully-featured [text editor][text-editors]. While you're at it, why not add some adjunct [graphical syntax representation][graphic-logic]? Such a system might have to be built from scratch using OpenGL(or Vulkan) to accommodate the demands of VR display.
 
 [text-editors]: http://ecc-comp.blogspot.com/2015/05/a-brief-glance-at-how-5-text-editors.html
 [graphic-logic]: https://www.reddit.com/r/graphiclogic
@@ -191,9 +209,9 @@ Of course it will be a massive security breach to run untested third-party code 
 
 ## Fun
 
-Developing using a scripting language is more fun. It's easier to just hit a button and reload, rather than recompiling and running every time. Lua is a fun language - small, easy to use, and fast. LuaJIT is even faster, and more powerful.
+Developing using a scripting language is more fun. It's easier to just hit a button and reload, rather than recompiling and running every time. You can still use your familiar debugging workflow with breakpoints and stack traces. Lua is a fun language - small, easy to use, and fast. LuaJIT is even faster, and more powerful.
 
-So I hope you try it out. This is how I want to do development from now on.
+So I hope you try it out! This is how I want to do development from now on.
 
 ##### Footnotes:
 
