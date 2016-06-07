@@ -8,7 +8,7 @@ categories: opengl amd glsl compiler
 I learned something today about OpenGL drivers.[^1] As I submitted my [demo entry for @party][@party], I tried a dry run on the compo machine - and it crashed immediately on exit with a warning:
 
 ```
-out of registers
+__ProgramInfoLog: WARNING: Too many temp register is used in Vertex shader, it may cause slow execution.
 ```
 
 Running with debug mode on gave no more information.
