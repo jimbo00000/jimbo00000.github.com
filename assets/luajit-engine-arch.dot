@@ -1,0 +1,44 @@
+// luajit-engine-arch.dot
+// dot luajit-engine-arch.dot -Tpng > luajit-engine-arch.png
+
+digraph Engine {
+	"Main" -> "glfw"
+	"Main" -> "Scene"
+	"Main" -> "Filter"
+	"Main" -> "util"
+	"Main" -> "OpenGL"
+	"Main" -> "Bass"
+	"Main" -> "LuaSocket"
+
+	"Scene" -> "OpenGL"
+	"Scene" -> "Bass"
+	"Scene" -> "util"
+
+	"Filter" -> "OpenGL"
+	"Filter" -> "util"
+
+	"glfw" -> "OpenGL"
+	"util" -> "OpenGL"
+
+	// All code requires LuaJIT
+	/*
+	"Main" -> "LuaJIT"
+	"Scene" -> "LuaJIT"
+	"Filter" -> "LuaJIT"
+	"util" -> "LuaJIT"
+	"LuaJIT" -> "OS"
+	"LuaJIT" [shape=component]
+	*/
+	
+	// All requires the OS
+	"OpenGL" -> "OS"
+	"LuaSocket" -> "OS"
+	"Bass" -> "OS"
+	"glfw" -> "OS"
+	"OS" [shape=component]
+
+	"OpenGL" [shape=component]
+	"Bass" [shape=component]
+	"glfw" [shape=component]
+	"LuaSocket" [shape=component]
+}
