@@ -1,0 +1,54 @@
+// luajit-utils-arch.dot
+// dot luajit-utils-arch.dot -Tpng > luajit-utils-arch.png
+
+digraph utils {
+
+	subgraph cluster_0 {
+		label = "util"
+
+		"glfont" -> "bmfont"
+		"glfont" -> "shaderfunctions"
+		"glfont" -> "matrixmath"
+
+		//"camera" -> "glfw"
+		"camera" -> "matrixmath"
+
+		"cubemesh" -> "shaderfunctions"
+		"cubemesh" -> "matrixmath"
+
+		"filter" -> "shaderfunctions"
+		"filter" -> "fbofunctions"
+
+		"fullscreen_shader" -> "shaderfunctions"
+
+		"slideshow" -> "glfont"
+		"slideshow" -> "matrixmath"
+		//"obj"
+	}
+
+	"shaderfunctions" -> "OpenGL"
+	"fbofunctions" -> "OpenGL"
+	"filter" -> "OpenGL"
+	"glfont" -> "OpenGL"
+	"glfw" -> "OpenGL"
+
+	"bmfont" -> "OS"
+	//"obj" -> "OS"
+
+	// External dependencies structure
+	"main" -> "glfw"
+	"main" -> "camera"
+	"main" -> "Scene"
+	"main" -> "filter"
+
+	"Scene" -> "cubemesh"
+	"Scene" -> "glfont"
+	"Scene" -> "fullscreen_shader"
+	//"Scene" -> "filter"
+	"Scene" -> "slideshow"
+	//"Scene" -> "obj"
+
+	"OpenGL" [shape=component]
+	"glfw" [shape=component]
+	"OS" [shape=component]
+}

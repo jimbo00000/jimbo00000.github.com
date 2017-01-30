@@ -56,6 +56,9 @@ Here are the main components of the [opengl-with-luajit][opengl-with-luajit] rep
 
 [opengl-with-luajit]: https://bitbucket.org/jimbo00000/opengl-with-luajit
 
+Here are the modules within the util component and their dependencies:
+
+![dependency graph](/assets/luajit-utils-arch.png)
 
 ### Engine Strengths
 
