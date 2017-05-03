@@ -15,7 +15,7 @@ I adopted this strategy in all my latest projects that use LuaJIT to call into O
 [on_lua_draw]: https://bitbucket.org/jimbo00000/riftskel/src/ac4dfa51f11ca07d1e0e34dd4e44fd447d7cf630/lua/scenebridge.lua?at=master&fileviewer=file-view-default#scenebridge.lua-74
 
 
-### The Model and View matrices
+### The Modelview, Model and View matrices
 
 So the first time I tried to move my head around and examine the specular highlights on an object, it was not right. The highlights were stuck to the model! After the standard amount of flailing around [shotgun debugging][shotgun debugging], I had tried all possible permutations and discovered there was no way this approach was ever going to get it right. I needed another variable.
 
@@ -23,15 +23,23 @@ I now see that the presence of this new variable is due to the fact that the lig
 
 [shotgun debugging]: https://en.wikipedia.org/wiki/Shotgun_debugging
 
-### API Breaking change ahead
+### API Breaking change ahead?
 
-So, this means I have to break all the scene code that has been written by adding a new parameter to `render_for_one_eye`. Here's the current signature:
+So, this means I might have to break all the scene code that has been written by changing the signature of `render_for_one_eye`.
 
 ~~~lua
 function scene.render_for_one_eye(view, proj)
 ~~~
 
-Since Lua is a stack machine, we could just add the `model` parameter to the end of the list, and if it's not passed in, it will be `nil`.
+I want to add the model matrix to that parameter list
+
+~~~lua
+function scene.render_for_one_eye(view, proj, model)
+~~~
+
+
+
+Since Lua is a stack machine, the value effectively defaults to `nil`. We are free to ignore it. Some developers find the stack-based architecture to be a mistake, and something does feel kind of loose about it. But it can be convenient.
 
 
 ~~~lua
@@ -42,45 +50,42 @@ function scene.render_for_one_eye(view, proj, model)
 	...
 ~~~
 
-Something doesn't sit right with me about this, the order of the matrices should be model-view-projection. But then again, maybe the model matrix can be thought of as the optional one, and therefore makes sense in the last position as it can be omitted?
+I thought while I was in there I'd change the function name to renderEye. Now maybe I won't bother.
 
-~~~lua
-function scene.render_for_one_eye(model, view, proj)
-	if proj == nil then
-		-- Passed in only view, proj matrices
-		view = model
-		proj = view
-		mm.make_identity_matrix(model)
-	end
-	...
-~~~
+#### Safeguarding camera controls against the change
 
-Is this option ten times uglier?
+By renaming a new entry point `renderEye`, main can check if the new entry point exists, otherwise calling the old one with a concatenated modelview matrix.
 
 
-## Rotation UIs
+## Movement and Rotation UIs
 
-Using the Unity editor interface has also provided me with a bit of perspective on this issue. Clicking and dragging in the window with the rotation tool/state active produces one effect, and holding the alt key while clicking and dragging produces another. These two rotation schemes are called **Orbit** and **Flythrough**.
+Now that there's a camera class that can be swapped in and out for other cameras, different classes can specialize:
 
-The orbit scheme fits perfectly for a smallish object; something that can be held in your hand. The flythrough scheme fits for a large environment; something that you can observe from within.
+  - static camera
+  - animated camera (uses `timestep`)
+  - user-controlled camera (uses input functions)
 
+Camera modules now call into glfw and SDL to get input - maybe there should be another layer on top: `cameraControl`, which itself receives input from the windowing library, and attaches to a simpler camera model which holds only position, orientation, velocity, etc.
 
-#### How to choose which UI?
+Unity has provided me a model of UI controls. Clicking and dragging in the window with the rotation tool/state active produces one effect, and holding the alt key while clicking and dragging produces another. These two rotation schemes are called **Orbit** and **Flythrough**. The orbit scheme fits perfectly for a smallish object; something that can be held in your hand. The flythrough scheme fits for a large environment; something that you can observe from within.
 
-Some *scenes* draw a small object and would be a perfect fit for the orbit scheme. These scene-objects could also be a really great fit for some hand control interaction, i.e. the [Vive wand][ViveWand], [Razer Hydra][Hydra] or Oculus Touch. But how will we know which scenes are appropriate for this? Where is the center and the bounding box for the ones that are?
+#### Handsets in VR, Mouse on Screen
+
+Way back when developing RiftSkeleton with the [Razer Hydra][Hydra], I added an extra input "channel" for hand manipulation. Mapping the hand channel to model matrix and the head to view matrix is a very satisfying fit. With a screen interface, it would be nice if the control scheme could provide input to both view and model matrices. A seemingly sensible way is to use left button for model rotation, and right button for view position.
 
 [Hydra]: https://bitbucket.org/jimbo00000/riftskel/src/ac4dfa51f11ca07d1e0e34dd4e44fd447d7cf630/src/Scene/LuajitScene.cpp?at=master&fileviewer=file-view-default#LuajitScene.cpp-258
 
 [ViveWand]: https://bitbucket.org/jimbo00000/riftskel/src/ac4dfa51f11ca07d1e0e34dd4e44fd447d7cf630/src/Scene/LuajitScene.cpp?at=master&fileviewer=file-view-default#LuajitScene.cpp-343
 
-I suppose the best way to do this is explicitly. Maybe we can add some kind of metadata field indicating this information for the host app so it can make the best use of any available interactive resources(mouse, etc.) to display the thing. This puts an extra burden on the programmers on *both* sides.
 
-#### Determine it implicitly
 
-Is this possible? Can the spatial extents of a scene be determined merely by examining the code? I think this might be intractably difficult, considering what can be done in shader to any scene data. And it kinda completely falls apart for shadertoy-style scenes that eschew the vertex pipeline entirely.
+For the screen controls, we'll rotate about the origin and have assume a camera distance for the view matrix. We hope we'll be close enough to see everything, but not too close. So far, keeping objects to around a meter in size sounds like a reasonable guideline. It's right in the sweet spot of the float datatype, and we can intuitively scale objects and scenes as necessary when composing environments from multiple parts.
 
-For now, I think it's best to just keep scenes centered on the origin and of a size around 1m cubed(everything is in meters). There will probably be some metadata fields added to the "standard", and once that starts taking shape this will be there as well.
 
-#### Metadata fields, Lua and generality
+#### Left click Model, Right click View
 
-Lua seems like a good fit for this general metadata: the table structure lets us add pretty much whatever and gracefully ignore it if any field is not present. It felt natural and easy for the [Vive wand][ViveWand] integration, even if it's not the cleanest thing in the world. 
+We'd like to control the model and view matrices independently. 
+
+This way we don't have to wonder about the context in which UI control is used and how big the scene extents are...
+
+A modifier key could work for this - or the other mouse button. Since this program has no right-click menus, there's a whole mouse button available for use in partitioning input space. This way we can use modifiers in conjunction to do translation *or* rotation on click & drag, for both view and model. This seems like an intuitive and useful fit, so far.

@@ -30,19 +30,26 @@ I whipped up a couple of example demos(frameworks? test beds?) using higher conv
 [Lua is Lisp]: https://github.com/meric/l2l
 
 
-### Higher level language aside
-
+<div style="
+background-color: #eeeeee;
+margin-left: 40px;
+padding: 10px;
+border: 10px solid white;
+//outline: #222222 groove thick;">
+<font size="+2">Higher level language aside</font><br>
+<br>
 I'm open to trying out a new language for programming OpenGL. I had my eyes on Ruby, but was not able to make it work on Windows. I would warmly welcome any assistance on the matter.
-
+<br><br>
 Javascript is another good choice of language, and works great with WebGL in a browser. I'd like to try plugging it into regular desktop OpenGL 4.5, but not sure how to go about it. I'd probably start with a small implementation like Duktape.
-
-Racket is another option, and it has some bindings already. DrRacket IDE is a fully functional environment, and there is even [an Android option][racket-android].
-
+<br><br>
+Racket is another option, and it has some bindings already. DrRacket IDE is a fully functional environment, and there is even <a href="https://github.com/jeapostrophe/racket-android">an Android option: racket-android</a>.
+<br><br>
 Something functional like Lisp or Haskell might be educational. Perl would be another good option for our aging programmer friends.
-
+<br><br>
 I think all a candidate language really needs is a way to allocate memory "natively" and lay out data in specified formats(32 bit float, 8 bit unsigned char, etc.). Sometimes that's handled by the binding code to present a more idiomatic interface to the language.
+</div>
 
-[racket-android]: https://github.com/jeapostrophe/racket-android
+
 
 ## Feature Accretion
 
