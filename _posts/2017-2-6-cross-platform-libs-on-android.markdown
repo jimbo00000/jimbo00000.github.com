@@ -22,8 +22,12 @@ There are [a lot of operating systems][OSList] out there. As much as I would lov
  - FreeBSD
  - Android
  - MacOS
+ - [QNX][QNX]? [What does it take to buy in here?][Qnxonhn]
 
 I would like to see this list grow.
+
+[QNX]: http://www.qnx.com/developers/docs/6.3.2/neutrino/user_guide/os_intro.html
+[Qnxonhn]: https://news.ycombinator.com/item?id=14230112
 
 [OSList]: https://en.wikipedia.org/wiki/List_of_operating_systems
 
