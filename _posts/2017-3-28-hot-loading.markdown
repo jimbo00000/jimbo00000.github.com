@@ -20,37 +20,14 @@ Infinite loops are another class of problem. Since there is no way to determine 
 
 Slow-running code is yet another class of error that comes up in VR. If a module causes us to drop frame rate, we have to axe it immediately. Could we use the same watchdog thread with a 1/60 second timeout?  What if we had a second thread with its own GL context and run it there? We could share the output render texture with the main VR render thread and clock its FPS independently. This would grant the user a way of vetting incoming code by checking not only its frame rate but its actual output on a preview frame. Could we pull just surplus rendering power from the system for the guest code, ensuring our local compositor runs at maximal QoS? How can we allocate priority with low latency at runtime to GPU tasks?
 
-## Practice Run - Editable Shader Code
+#### Practice Run - Editable Shader Code
 
-Editing shader code is a good first pass toward the goal of live-edited hot-loaded code. GLSL is passed to the driver as a string for compilation at runtime via `glCompileShader`. None of the calling code needs to be changed for this to be realized, so the flexibility is not total, but it is enough to play with and get some real results. Parts of the implementation can be reused for a more complete self-editing system - the source editor and the terminal.
-
-### Controls
-
-The editor and terminal can be toggled by a key. Which key is a matter of taste, I like to line them up under escape.
-
-#### Key values/layouts
-
-#### Mouse clicks too
-
-### Error layer
-
-### Recompile on each keystroke
-
-### Hide/show and the "terminal"
-
-### Tweakbar?
-
-## Where does it live?
-Include in scene
-Move out to main? An intermediary?
+Editing shader code is a good first pass toward the goal of live-edited hot-loaded code. I'm not sure it can ever make the process crash, but you can see what happens on an infinite loop.
 
 
-## Shader types
-Single shader string only
-VS TCS TES GS FS CS
-Feedback
+## What we ultimately want
 
+We need a compositor that positively cannot crash and must run with consistent quality of service. Its runtime needs to be bounded. It has to share GPU memory with any user processes, which sounds like it could be a huge security hole in a memory-protected OS. In practice, we can impose specific restrictions on the shared surface: the compositor only needs read access to a contiguous block in a known format.
 
-#### Future plans
-DrawIndirect?
+The compositor proces should be the top priority process in the entire system. Everything else can crash but that. The core of the system is a loop that reads a matrix of head pose from a hardware subsystem right before each scanout(or chunk wise before each scanline), performing timewarped compositing and dumping pixels to the HMD. Once done, it can hand off that head pose data to any user programs/scenes which are free to write to the shared compositor surface or crash and burn. A watchdog could indicate if a user process hasn't met its deadline and exclude its layer from the compositor if necessary.
 

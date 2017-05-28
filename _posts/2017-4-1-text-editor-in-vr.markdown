@@ -64,9 +64,18 @@ A [small function][mousepos] to translate mouse position into rows,columns lets 
 
 [mousepos]: https://bitbucket.org/jimbo00000/opengl-with-luajit/src/c77d5e600b00586b0b83d7c0dac940e3d5f504fc/scene/shader_editor.lua?at=master&fileviewer=file-view-default#shader_editor.lua-126
 
-Recompiling small shader code on each keystroke turns out to be quick and *very* satisfying.
-
 
 #### Error layer
 
-Syntax highlighting, lexing, parsing, TODO
+Recompiling small shader code on each keystroke turns out to be quick and *very* satisfying when errors are displayed inline. Parsing the line numbers from OpenGL shader compiler error messages is easy, and thanks to GLSL's #line directive, we can send a standard shader header/preamble and get line numbers specific to the snippet that's edited.
+
+
+#### More layers?
+
+Syntax highlighting would be pretty cool. We could do something basic like highlighting keywords, but to get fully-featured syntax highlighting we'll need an AST. Writing a lexer and parser is way out of scope for this project, and even getting LLVM to build is probably more work than I'm ready to invest now.
+
+
+### Success
+
+It's virtually featureless, but it works. Never meant as a replacement for other real editors, it's only for hot edits and quick tweaks on working (or almost working) shader code. Great for debugging, your favorite editor is only a control-s away.
+

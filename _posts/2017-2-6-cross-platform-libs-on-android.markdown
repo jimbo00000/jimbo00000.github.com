@@ -18,8 +18,8 @@ There are [a lot of operating systems][OSList] out there. As much as I would lov
 
  - Windows
  - Linux
- - Solaris
- - FreeBSD
+ - Solaris (NVidia only)
+ - FreeBSD (NVidia only)
  - Android
  - MacOS
  - [QNX][QNX]? [What does it take to buy in here?][Qnxonhn]
