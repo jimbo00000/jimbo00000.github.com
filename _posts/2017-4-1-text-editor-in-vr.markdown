@@ -32,10 +32,12 @@ I came across [Scintilla][Scintilla]; probably the best fit for my needs. Daunte
 [ScintillaGL][ScintillaGL] - 5 years old with no updates. Good enough for Gargaj and 
 [Bonzomatic][Bonzomatic]
 
+[codedit][codedit] - I will have to look into this. Looks abandoned, but just about esactly what I want...
+
 [Scintilla]: http://www.scintilla.org/
 [Bonzomatic]: https://github.com/Gargaj/Bonzomatic
 [ScintillaGL]: https://github.com/sopyer/ScintillaGL
-
+[codedit]: https://luapower.com/codedit
 
 ### Editor plugin
 
